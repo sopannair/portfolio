@@ -1,6 +1,7 @@
 body {
-  /* Set line height to 1.5 times the font size
-	   and use the OS’s UI font as the website font
-	 */
-  font: 100%/1.5 system-ui;
+  max-width: 80ch; /* ~80 characters per line, great for readability */
+  margin: 0 auto;  /* centers the body content horizontally */
+  padding: 1rem;   /* adds breathing room on small screens */
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
 }
