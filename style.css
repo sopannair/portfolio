@@ -1,7 +1,141 @@
+:root {
+  --color-accent: #1C3D5A; /* Toledo Blue — BMW 482 */
+}
+
+html {
+  accent-color: var(--color-accent);
+}
+
 body {
-  max-width: 80ch; /* ~80 characters per line, great for readability */
-  margin: 0 auto;  /* centers the body content horizontally */
-  padding: 1rem;   /* adds breathing room on small screens */
+  background-color: oklch(from var(--color-accent) 89% 3% h);
+  max-width: 110ch;
+  margin-inline: auto;
+  padding: 2rem;
   font-family: Arial, sans-serif;
   line-height: 1.6;
 }
+/* Reset list behavior */
+nav ul,
+nav li {
+  display: contents;
+}
+
+/* Turn <nav> into a flex container */
+nav {
+  display: flex;
+  margin-bottom: 1.5rem; /* space below the nav */
+  border-bottom: 1px solid oklch(80% 3% 200); /* subtle cool gray line */
+}
+
+/* Style all nav links */
+nav a {
+  flex: 1;                      /* equal space for each link */
+  text-decoration: none;        /* remove underline */
+  color: inherit;               /* inherit text color from parent */
+  text-align: center;           /* center link text */
+  padding: 0.5em;               /* space inside each link box */
+}
+
+/* Style the current page link */
+nav a.current {
+  border-bottom: 0.4em solid oklch(80% 3% 200); /* thicker line to highlight current page */
+  padding-bottom: 0.1em; /* reduce padding-bottom to counteract border thickness */
+}
+
+nav a:hover {
+  border-bottom: 0.4em solid var(--color-accent);
+  padding-bottom: 0.1em; /* match the current link height */
+}
+
+h1, h2, h3 {
+  color: var(--color-accent);
+}
+
+button {
+  background-color: var(--color-accent);
+  color: white;
+}
+
+/* Contact form: labels */
+form label {
+  display: block;                /* line break before & after */
+  margin-block: 0.75rem 0.25rem; /* space above/below label */
+  font-weight: 600;              /* optional: make labels clearer */
+}
+
+/* Contact form: controls (inputs, selects, textareas) */
+form {
+  display: grid;
+  grid-template-columns: auto 1fr; /* label fits content, input takes the rest */
+  gap: 0.75rem 1rem;              /* row gap, column gap */
+  max-width: 40rem;              /* optional: keeps the form from being too wide */
+}
+
+form label {
+  text-align: left;
+  align-self: center; /* vertically center relative to inputs */
+  font-weight: 600;
+}
+
+form input,
+form textarea {
+  font: inherit;
+  width: 100%;          /* fill the grid cell */
+  box-sizing: border-box;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid oklch(80% 3% 200);
+  border-radius: 0.5rem;
+}
+
+form textarea {
+  min-height: 6rem; /* make it taller by default */
+}
+
+.projects {
+  display: grid; 
+  grid-template-columns: repeat(auto-fill, minmax(15em, 1fr));
+  gap: 1.5rem; /* space between project cards */
+  margin-top: 2rem;
+}
+
+.projects article {
+  display: grid;
+  grid-template-rows: subgrid; /* inherit row structure */
+  grid-row: span 3;            /* each article spans 3 rows */
+  margin: 0;                   /* remove default spacing */
+  background: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.projects {
+  /* card styles ... */
+  h2 {
+    /* slightly smaller inside cards, but still distinct */
+    font-size: clamp(1.25rem, 1.8vw + 0.5rem, 1.75rem);
+  }
+}
+
+/* ---------- Global heading defaults ---------- */
+:where(h1, h2, h3, h4, h5, h6) {
+  line-height: 1.1;       /* tighter than body for strong headings */
+  text-wrap: balance;     /* prettier multi-line headings */
+  margin: 0 0 0.5em;      /* consistent bottom spacing */
+}
+
+/* Make H1 dramatically larger (≈400% of body text) */
+h1 {
+  font-size: clamp(2.5rem, 6vw + 1rem, 2rem);
+}
+
+/* Ensure H2 is clearly smaller than H1, bigger than body */
+h2 {
+  font-size: clamp(1.375rem, 2.2vw + 0.5rem, 1.3rem);
+}
+
+/* Optional: a sensible scale for the rest */
+h3 { font-size: 1.2rem; }
+h4 { font-size: 1.125rem; }
+h5 { font-size: 1rem; }
+h6 { font-size: 0.875rem; }
