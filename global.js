@@ -15,6 +15,41 @@ const BASE_PATH =
     ? '/' // Local server
     : '/portfolio/'; // GitHub Pages repo name
 
+// --- Inject color scheme switch (top-right) ---
+document.body.insertAdjacentHTML(
+  'afterbegin',
+  `
+  <label class="color-scheme">
+    Theme:
+    <select>
+      <option value="light dark">Automatic</option>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+  </label>
+  `
+);
+
+const select = document.querySelector('.color-scheme select');
+
+if ('colorScheme' in localStorage) {
+  const savedScheme = localStorage.colorScheme;
+  document.documentElement.style.setProperty('color-scheme', savedScheme);
+  select.value = savedScheme; // keep dropdown in sync
+}
+
+
+select.addEventListener('input', (event) => {
+  const newScheme = event.target.value;
+  console.log('color scheme changed to', newScheme);
+
+  // Apply the scheme to the root element
+  document.documentElement.style.setProperty('color-scheme', newScheme);
+
+  // Save the user’s preference for next time
+  localStorage.colorScheme = newScheme;
+});
+
 
 let pages = [
   { url: '', title: 'Home' },
@@ -40,3 +75,4 @@ a.classList.toggle(
   'current',
   a.host === location.host && a.pathname === location.pathname,
 );
+

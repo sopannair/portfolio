@@ -1,9 +1,36 @@
-:root {
-  --color-accent: #1C3D5A; /* Toledo Blue — BMW 482 */
+:root { 
+  color-scheme: light dark;
+  --color-accent: #1c3d5a51; 
 }
+
+.color-scheme {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+
+  background: oklch(from var(--color-accent) 95% 5% h); /* subtle tint */
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+}
+
+.color-scheme:hover {
+  opacity: 1;
+}
+
+.color-scheme select {
+  margin-left: 0.4rem;
+  padding: 0.3rem 0.5rem;
+  font: inherit;
+}
+
 
 html {
   accent-color: var(--color-accent);
+  
 }
 
 body {
@@ -24,7 +51,9 @@ nav li {
 nav {
   display: flex;
   margin-bottom: 1.5rem; /* space below the nav */
-  border-bottom: 1px solid oklch(80% 3% 200); /* subtle cool gray line */
+  border-bottom: 1px solid oklch(80% 3% 200);
+
+
 }
 
 /* Style all nav links */
@@ -48,7 +77,7 @@ nav a:hover {
 }
 
 h1, h2, h3 {
-  color: var(--color-accent);
+  color: rgba(15, 12, 98, 0.627);
 }
 
 button {
@@ -103,7 +132,7 @@ form textarea {
   grid-template-rows: subgrid; /* inherit row structure */
   grid-row: span 3;            /* each article spans 3 rows */
   margin: 0;                   /* remove default spacing */
-  background: white;
+  background: var(--color-accent);
   padding: 1rem;
   border-radius: 0.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
