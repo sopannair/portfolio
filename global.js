@@ -64,17 +64,19 @@ document.body.prepend(nav);
 for (let p of pages) {
   let url = p.url;
   let title = p.title;
-  // next step: create link and add it to nav
-  if (!url.startsWith('http')) {
-  url = BASE_PATH + url;
-}
+
+  if (!url.startsWith('http')) url = BASE_PATH + url;
   nav.insertAdjacentHTML('beforeend', `<a href="${url}">${title}</a>`);
 }
 
-a.classList.toggle(
-  'current',
-  a.host === location.host && a.pathname === location.pathname,
-);
+// Highlight current page link
+const navLinks = nav.querySelectorAll('a');
+navLinks.forEach((a) => {
+  a.classList.toggle(
+    'current',
+    a.host === location.host && a.pathname === location.pathname
+  );
+});
 
 export async function fetchJSON(url) {
   try {
@@ -90,17 +92,22 @@ export async function fetchJSON(url) {
   }
 }
 
-export function renderProjects(project, containerElement) {
-  // Your code will go here
+export function renderProjects(projects, containerElement, headingLevel = 'h3') {
   containerElement.innerHTML = '';
-  const article = document.createElement('article');
-  article.innerHTML = `
-    <h3>${project.title}</h3>
-    <img src="${project.image}" alt="${project.title}">
-    <p>${project.description}</p>
-`;
-  containerElement.appendChild(article);
 
+  projects.forEach(project => {
+    const article = document.createElement('article');
+    article.innerHTML = `
+      <${headingLevel}>${project.title}</${headingLevel}>
+      <img src="${project.image}" alt="${project.title}">
+      <p>${project.description}</p>
+    `;
+    containerElement.appendChild(article);
+  });
+}
 
-
+// --- Fetch GitHub data helper ---
+export async function fetchGitHubData(username) {
+  // Uses your existing fetchJSON utility to get data from GitHub’s API
+  return fetchJSON(`https://api.github.com/users/${username}`);
 }
