@@ -95,16 +95,23 @@ export async function fetchJSON(url) {
 export function renderProjects(projects, containerElement, headingLevel = 'h3') {
   containerElement.innerHTML = '';
 
-  projects.forEach(project => {
+  for (const project of projects) {
     const article = document.createElement('article');
+
+    // wrap description + year together in a div so they stay in same grid cell
     article.innerHTML = `
       <${headingLevel}>${project.title}</${headingLevel}>
-      <img src="${project.image}" alt="${project.title}">
-      <p>${project.description}</p>
+      ${project.image ? `<img src="${project.image}" alt="${project.title}">` : ''}
+      <div class="project-details">
+        ${project.description ? `<p>${project.description}</p>` : ''}
+        ${project.year ? `<p class="project-year"><strong>${project.year}</strong></p>` : ''}
+      </div>
     `;
+
     containerElement.appendChild(article);
-  });
+  }
 }
+
 
 // --- Fetch GitHub data helper ---
 export async function fetchGitHubData(username) {
