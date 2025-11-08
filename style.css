@@ -369,6 +369,7 @@ circle {
   transition: 200ms;
   transform-origin: center;
   transform-box: fill-box;
+
 }
 
 circle:hover {
@@ -377,4 +378,78 @@ circle:hover {
 
 .hidden {
   display: none !important;
+}
+
+dl.info {
+  /* ... other styles ... */
+  transition-duration: 500ms;
+  transition-property: opacity, visibility;
+}
+
+dl.info[hidden]:not(:hover, :focus-within) {
+  opacity: 0;
+  visibility: hidden;
+}
+
+@keyframes marching-ants {
+  to {
+    stroke-dashoffset: -8; /* 5 + 3 */
+  }
+}
+
+.selection {
+  fill-opacity: 0.1;
+  stroke: black;
+  stroke-opacity: 0.7;
+  stroke-dasharray: 5 3;
+  animation: marching-ants 2s linear infinite;
+}
+
+circle.selected {
+  fill: #ff6b6b;
+}
+
+#selection-count {
+  margin-top: 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #c9d1d9;
+}
+
+/* ===== Language breakdown (cards) ===== */
+.lang-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 24px;
+  margin-top: 8px;
+}
+
+.lang-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 16px 18px;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+.lang-name {
+  font-size: 1.1rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #b6bdc6;            /* muted label */
+  margin-bottom: 6px;
+}
+
+.lang-lines {
+  font-size: 1.8rem;
+  line-height: 1.1;
+  font-weight: 700;
+  color: #eef1f4;            /* bright number */
+}
+
+.lang-pct {
+  margin-top: 6px;
+  font-size: .95rem;
+  color: #9ea6af;            /* secondary text */
 }

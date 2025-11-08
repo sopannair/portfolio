@@ -1,5 +1,8 @@
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
 
+let xScale;
+let yScale;
+
 async function loadData() {
   const data = await d3.csv('loc.csv', (row) => ({
     ...row,
@@ -100,45 +103,94 @@ function renderCommitInfo(data, commits) {
 );
 }
 
+function createBrushSelector(svg) {
+  // Create brush
+svg.call(d3.brush().on('start brush end', brushed));
 
+// Raise dots and everything after overlay
+svg.selectAll('.dots, .overlay ~ *').raise();
+}
+
+
+function isCommitSelected(selection, commit) {
+  if (!selection) return false;
+  const [[x0, y0], [x1, y1]] = selection;   // brush pixel bounds
+  const x = xScale(commit.datetime);        // point pixel coords
+  const y = yScale(commit.hourFrac);
+  return x0 <= x && x <= x1 && y0 <= y && y <= y1;
+}
+
+function renderSelectionCount(selection) {
+  const selectedCommits = selection
+    ? commits.filter((d) => isCommitSelected(selection, d))
+    : [];
+
+  const countElement = document.querySelector('#selection-count');
+  countElement.textContent = `${
+    selectedCommits.length || 'No'
+  } commits selected`;
+
+  return selectedCommits;
+}
+
+function brushed(event) {
+  const selection = event.selection;
+  d3.selectAll('circle').classed('selected', (d) =>
+    isCommitSelected(selection, d),
+  );
+  renderSelectionCount(selection);
+  renderLanguageBreakdown(selection);
+}
 
 function renderScatterPlot(data, commits) {
-  // Put all the JS code of Steps inside this function
   const width = 1000;
   const height = 600;
+
   const svg = d3
-  .select('#chart')
-  .append('svg')
-  .attr('viewBox', `0 0 ${width} ${height}`)
-  .style('overflow', 'visible');
+    .select('#chart')
+    .append('svg')
+    .attr('viewBox', `0 0 ${width} ${height}`)
+    .style('overflow', 'visible');
 
-  const xScale = d3
-  .scaleTime()
-  .domain(d3.extent(commits, (d) => d.datetime))
-  .range([0, width])
-  .nice();
+  xScale = d3.scaleTime()
+    .domain(d3.extent(commits, d => d.datetime))
+    .range([0, width])
+    .nice();
 
-const yScale = d3.scaleLinear().domain([0, 24]).range([height, 0]);
+  yScale = d3.scaleLinear()
+    .domain([0, 24])
+    .range([height, 0]);
 
-const dots = svg.append('g').attr('class', 'dots');
+  const dots = svg.append('g').attr('class', 'dots');
 
-dots
-  .selectAll('circle')
-  .data(commits)
-  .join('circle')
-  .attr('cx', d => xScale(d.datetime))
-  .attr('cy', d => yScale(d.hourFrac))
-  .attr('r', 5)
-  .attr('fill', 'steelblue')
-  .on('mouseenter', (event, commit) => {
-    const tooltip = document.getElementById('commit-tooltip');
-    tooltip.classList.remove('hidden'); // show tooltip
-    renderTooltipContent(commit);
-  })
-    .on('mouseleave', () => {
-    document.getElementById('commit-link').textContent = '';
-    document.getElementById('commit-date').textContent = '';
+  const [minLines, maxLines] = d3.extent(commits, d => d.totalLines);
+  const rScale = d3.scaleSqrt()
+    .domain([minLines, maxLines])
+    .range([2, 30]);
+
+  const sortedCommits = d3.sort(commits, d => -d.totalLines);
+
+  dots.selectAll('circle')
+    .data(sortedCommits)
+    .join('circle')
+    .attr('cx', d => xScale(d.datetime))
+    .attr('cy', d => yScale(d.hourFrac))
+    .attr('r', d => rScale(d.totalLines))
+    .attr('fill', 'steelblue')
+    .style('fill-opacity', 0.5)
+    .on('mouseenter', (event, commit) => {
+      d3.select(event.currentTarget).style('fill-opacity', 1);
+      renderTooltipContent(commit);
+      updateTooltipVisibility(true);
+      updateTooltipPosition(event);
+    })
+    .on('mouseleave', event => {
+      d3.select(event.currentTarget).style('fill-opacity', 0.7);
+      updateTooltipVisibility(false);
     });
+
+  // ... axes and gridlines (you can leave that part unchanged)
+
 
 
 
@@ -186,6 +238,7 @@ svg
   .attr('transform', `translate(${usableArea.left}, 0)`)
   .call(yAxis);
 
+  createBrushSelector(svg)
 
 
 }
@@ -201,6 +254,71 @@ function renderTooltipContent(commit) {
   date.textContent = commit.datetime?.toLocaleString('en', {
     dateStyle: 'full',
   });
+}
+function updateTooltipVisibility(isVisible) {
+  const tooltip = document.getElementById('commit-tooltip');
+  tooltip.hidden = !isVisible;
+}
+
+function updateTooltipPosition(event) {
+  const tooltip = document.getElementById('commit-tooltip');
+  tooltip.style.left = `${event.clientX}px`;
+  tooltip.style.top = `${event.clientY}px`;
+}
+
+function renderLanguageBreakdown(selection) {
+  const selectedCommits = selection
+    ? commits.filter(d => isCommitSelected(selection, d))
+    : [];
+
+  const container = document.getElementById('language-breakdown');
+
+  // Nothing selected -> clear and bail
+  if (selectedCommits.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+
+  const requiredCommits = selectedCommits.length ? selectedCommits : commits;
+  const lines = requiredCommits.flatMap(d => d.lines);
+
+  // Count lines per language
+  const roll = d3.rollups(lines, v => v.length, d => d.type); // [[lang, count], ...]
+  // Sort by count desc
+  roll.sort((a, b) => d3.descending(a[1], b[1]));
+
+  const total = lines.length;
+  const fmtPct = d3.format('.1~%');
+
+  // Build card grid
+  const grid = document.createElement('div');
+  grid.className = 'lang-grid';
+
+  for (const [language, count] of roll) {
+    const pct = fmtPct(count / total);
+
+    const card = document.createElement('div');
+    card.className = 'lang-card';
+
+    const name = document.createElement('div');
+    name.className = 'lang-name';
+    name.textContent = (language || '').toUpperCase();
+
+    const linesEl = document.createElement('div');
+    linesEl.className = 'lang-lines';
+    linesEl.textContent = `${count} lines`;
+
+    const pctEl = document.createElement('div');
+    pctEl.className = 'lang-pct';
+    pctEl.textContent = `(${pct})`;
+
+    card.append(name, linesEl, pctEl);
+    grid.appendChild(card);
+  }
+
+  // Inject grid into your existing element
+  container.innerHTML = '';
+  container.appendChild(grid);
 }
 
 

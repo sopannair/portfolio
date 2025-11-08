@@ -2,63 +2,63 @@
     {
         "title": "DSC 209R Deceptive Visualization Webpage",
         "year": "2025",
-        "image": "proj2-dsc209r.png",
+        "image": "/projects/proj2-dsc209r.png",
         "description": "A data visualization project exploring deceptive design techniques using real-world datasets."
     },
     {
         "title": "CSCI 3308 MovieMaster Webpage",
         "year": "2024",
-        "image": "moviemaster.png",
+        "image": "/projects/moviemaster.png",
         "description": "MovieMaster is a centralized platform for movie lovers who want a one-stop-shop for finding their next Movie. This website pulls ratings and reviews from credible movie review pages such as IMDb, TMDB, and MetaCritic."
     },{
         "title": "DSC 209R Expository Visualization",
         "year": "2025",
-        "image": "expository-vis.png",
+        "image": "/projects/expository-vis.png",
         "description": "A data visualization project exploring whether highly processed foods are cheaper per calorie than minimally processed foods."
     },{
         "title": "Machine Learning Benchmark Deployment Automation",
         "year": "2023",
-        "image": "ml-bench.png",
+        "image": "/projects/ml-bench.png",
         "description": "Used Bash scripts and Python to automate dataset retrieval, container deployment, and benchmark testing for multiple Machine Learning models."
     },{
         "title": "DSC 209R Placeholder project",
         "year": "2022",
-        "image": "proj2-dsc209r.png",
+        "image": "/projects/proj2-dsc209r.png",
         "description": "A data visualization project exploring deceptive design techniques using real-world datasets."
     },{
         "title": "DSC 209R Placeholder project",
         "year": "2023",
-        "image": "proj2-dsc209r.png",
+        "image": "/projects/proj2-dsc209r.png",
         "description": "A data visualization project exploring deceptive design techniques using real-world datasets."
     },{
         "title": "DSC 209R Placeholder project",
         "year": "2021",
-        "image": "proj2-dsc209r.png",
+        "image": "/projects/proj2-dsc209r.png",
         "description": "A data visualization project exploring deceptive design techniques using real-world datasets."
     },{
         "title": "DSC 209R Placeholder project",
         "year": "2023",
-        "image": "proj2-dsc209r.png",
+        "image": "/projects/proj2-dsc209r.png",
         "description": "A data visualization project exploring deceptive design techniques using real-world datasets."
     },{
         "title": "DSC 209R Placeholder project",
         "year": "2025",
-        "image": "proj2-dsc209r.png",
+        "image": "/projects/proj2-dsc209r.png",
         "description": "A data visualization project exploring deceptive design techniques using real-world datasets."
     },{
         "title": "DSC 209R Placeholder project",
         "year": "2025",
-        "image": "proj2-dsc209r.png",
+        "image": "/projects/proj2-dsc209r.png",
         "description": "A data visualization project exploring deceptive design techniques using real-world datasets."
     },{
         "title": "DSC 209R Placeholder project",
         "year": "2024",
-        "image": "proj2-dsc209r.png",
+        "image": "/projects/proj2-dsc209r.png",
         "description": "A data visualization project exploring deceptive design techniques using real-world datasets."
     },{
         "title": "DSC 209R Placeholder project",
         "year": "2024",
-        "image": "proj2-dsc209r.png",
+        "image": "/projects/proj2-dsc209r.png",
         "description": "A data visualization project exploring deceptive design techniques using real-world datasets."
     }
 ]
