@@ -275,3 +275,106 @@ path.selected {
   border-radius: 0.4em;
   padding: 0.25em 0.4em;
 }
+
+
+/* ===== Summary Stats ===== */
+.summary {
+  margin: 1.25rem 0 2rem;
+}
+
+.summary h2 {
+  font-size: 1.75rem;
+  margin: 0 0 .75rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+.stat {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.stat:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.25); }
+
+.stat dt {
+  font-size: .78rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #b6bdc6;                 /* muted label */
+  margin: 0 0 6px;
+}
+
+.stat dd {
+  margin: 0;
+  font-size: 1.8rem;
+  line-height: 1.1;
+  font-weight: 600;
+  color: oklch(0% 0 0);
+  text-align: center;
+  white-space: normal;   
+     
+}
+
+.stat small {
+  display: block;
+  margin-top: 6px;
+  font-size: .8rem;
+  color: #9ea6af;
+  word-break: break-word;
+}
+
+/* Info list laid out as two columns; tidy margins and subtle label/value styling */
+dl.info {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 12px;
+  row-gap: 6px;
+  align-items: start;
+}
+dl.info dt,
+dl.info dd { margin: 0; }
+dl.info dt {
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #aeb6bf;             /* labels less prominent */
+}
+dl.info dd {
+  font-weight: 600;            /* values more prominent */
+  color: #eef1f4;
+}
+
+/* Temporary placement so you can always see it while testing */
+.tooltip {
+  position: fixed;
+  top: 1em;
+  left: 1em;
+  z-index: 1000;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 10px 12px;
+  backdrop-filter: blur(4px);
+}
+
+circle {
+  transition: 200ms;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+circle:hover {
+  transform: scale(1.5);
+}
+
+.hidden {
+  display: none !important;
+}
