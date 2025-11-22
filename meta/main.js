@@ -89,6 +89,7 @@ function renderCommitInfo(data, commits) {
     if (sub) card.append('small').html(sub);
   };
 
+
   tile('Commits', fmt(commits.length));
   tile('Files', fmt(numFiles));
   tile('Total LOC', fmt(data.length));
@@ -142,6 +143,7 @@ function brushed(event) {
   renderLanguageBreakdown(selection);
 }
 
+
 function renderScatterPlot(data, commits) {
   const width = 1000;
   const height = 600;
@@ -171,7 +173,7 @@ function renderScatterPlot(data, commits) {
   const sortedCommits = d3.sort(commits, d => -d.totalLines);
 
   dots.selectAll('circle')
-    .data(sortedCommits)
+    .data(sortedCommits, (d) => d.id) // change this line
     .join('circle')
     .attr('cx', d => xScale(d.datetime))
     .attr('cy', d => yScale(d.hourFrac))
@@ -227,20 +229,70 @@ const xAxis = d3.axisBottom(xScale);
   .tickFormat((d) => String(d % 24).padStart(2, '0') + ':00');
 
 // Add X axis
-svg
-  .append('g')
-  .attr('transform', `translate(0, ${usableArea.bottom})`)
-  .call(xAxis);
+  svg
+    .append('g')
+    .attr('transform', `translate(0, ${usableArea.bottom})`)
+    .attr('class', 'x-axis') // new line to mark the g tag
+    .call(xAxis);
 
-// Add Y axis
-svg
-  .append('g')
-  .attr('transform', `translate(${usableArea.left}, 0)`)
-  .call(yAxis);
+  svg
+    .append('g')
+    .attr('transform', `translate(${usableArea.left}, 0)`)
+    .attr('class', 'y-axis') // just for consistency
+    .call(yAxis);
 
   createBrushSelector(svg)
 
 
+}
+
+function updateScatterPlot(data, commits) {
+  const width = 1000;
+  const height = 600;
+  const margin = { top: 10, right: 10, bottom: 30, left: 20 };
+  const usableArea = {
+    top: margin.top,
+    right: width - margin.right,
+    bottom: height - margin.bottom,
+    left: margin.left,
+    width: width - margin.left - margin.right,
+    height: height - margin.top - margin.bottom,
+  };
+
+  const svg = d3.select('#chart').select('svg');
+
+  xScale = xScale.domain(d3.extent(commits, (d) => d.datetime));
+
+  const [minLines, maxLines] = d3.extent(commits, (d) => d.totalLines);
+  const rScale = d3.scaleSqrt().domain([minLines, maxLines]).range([2, 30]);
+
+  const xAxis = d3.axisBottom(xScale);
+
+// Reuse existing axis group instead of appending a new one
+svg.select('.x-axis').call(xAxis);
+
+  const dots = svg.select('g.dots');
+
+  const sortedCommits = d3.sort(commits, (d) => -d.totalLines);
+  dots
+    .selectAll('circle')
+    .data(sortedCommits, (d) => d.id)
+    .join('circle')
+    .attr('cx', (d) => xScale(d.datetime))
+    .attr('cy', (d) => yScale(d.hourFrac))
+    .attr('r', (d) => rScale(d.totalLines))
+    .attr('fill', 'steelblue')
+    .style('fill-opacity', 0.7) // Add transparency for overlapping dots
+    .on('mouseenter', (event, commit) => {
+      d3.select(event.currentTarget).style('fill-opacity', 1); // Full opacity on hover
+      renderTooltipContent(commit);
+      updateTooltipVisibility(true);
+      updateTooltipPosition(event);
+    })
+    .on('mouseleave', (event) => {
+      d3.select(event.currentTarget).style('fill-opacity', 0.7);
+      updateTooltipVisibility(false);
+    });
 }
 
 function renderTooltipContent(commit) {
@@ -326,5 +378,44 @@ let data = await loadData();
 let commits = processCommits(data);
 
 renderScatterPlot(data, commits);
+
+let commitProgress = 100;
+
+let timeScale = d3
+  .scaleTime()
+  .domain([
+    d3.min(commits, (d) => d.datetime),
+    d3.max(commits, (d) => d.datetime),
+  ])
+  .range([0, 100]);
+let commitMaxTime = timeScale.invert(commitProgress);
+
+
+// Will get updated as user changes slider
+let filteredCommits = commits;
+
+
+
+function onTimeSliderChange(event) {
+  // 1. Update commitProgress
+  commitProgress = +event.target.value;
+
+  // 2. Convert slider range → datetime
+  commitMaxTime = timeScale.invert(commitProgress);
+
+  // 3. Update <time> element output
+  const timeEl = document.getElementById('commit-time');
+  timeEl.textContent = commitMaxTime.toLocaleString();
+  filteredCommits = commits.filter((d) => d.datetime <= commitMaxTime);
+  updateScatterPlot(data, filteredCommits)
+
+}
+
+document
+  .getElementById('commit-progress')
+  .addEventListener('input', onTimeSliderChange);
+
+// Call once to initialize
+onTimeSliderChange({ target: document.getElementById('commit-progress') });
 
 

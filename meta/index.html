@@ -10,7 +10,14 @@
   <body>
     <main>
       <h1>Meta</h1>
-
+    <div class="time-slider-container">
+      <label>
+        Show commits until:
+        <input type="range" id="commit-progress" min="0" max="100" value="100" />
+        <time id="commit-time"></time>
+      </label>
+    </div>
+      
       <div id="stats"></div>
 
       <div id="chart"></div>
