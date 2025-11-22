@@ -1,4 +1,7 @@
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
+import scrollama from 'https://cdn.jsdelivr.net/npm/scrollama@3.2.0/+esm';
+
+
 
 let xScale;
 let yScale;
@@ -373,9 +376,33 @@ function renderLanguageBreakdown(selection) {
   container.appendChild(grid);
 }
 
+function setCommitMaxTime(maxTime) {
+  // 1. Store new max time
+  commitMaxTime = maxTime;
+
+  // 2. Compute slider value from time (0–100)
+  commitProgress = timeScale(maxTime);
+  const slider = document.getElementById('commit-progress');
+  slider.value = commitProgress;
+
+  // 3. Update <time> label
+  const timeEl = document.getElementById('commit-time');
+  timeEl.textContent = commitMaxTime.toLocaleString();
+
+  // 4. Filter commits & update visuals
+  filteredCommits = commits.filter((d) => d.datetime <= commitMaxTime);
+
+  updateScatterPlot(data, filteredCommits);
+  updateFileDisplay(filteredCommits);
+}
+
 
 let data = await loadData();
 let commits = processCommits(data);
+
+// Sort commits chronologically (oldest → newest)
+commits = d3.sort(commits, d => d.datetime);
+
 
 renderScatterPlot(data, commits);
 
@@ -436,20 +463,16 @@ function updateFileDisplay(filteredCommits) {
 
 
 function onTimeSliderChange(event) {
-  // 1. Update commitProgress
+  // Slider gives us a 0–100 value
   commitProgress = +event.target.value;
 
-  // 2. Convert slider range → datetime
-  commitMaxTime = timeScale.invert(commitProgress);
+  // Map slider value -> Date
+  const maxTime = timeScale.invert(commitProgress);
 
-  // 3. Update <time> element output
-  const timeEl = document.getElementById('commit-time');
-  timeEl.textContent = commitMaxTime.toLocaleString();
-  filteredCommits = commits.filter((d) => d.datetime <= commitMaxTime);
-  updateScatterPlot(data, filteredCommits)
-  updateFileDisplay(filteredCommits)
-
+  // Delegate to shared helper
+  setCommitMaxTime(maxTime);
 }
+
 
 document
   .getElementById('commit-progress')
@@ -459,3 +482,47 @@ document
 onTimeSliderChange({ target: document.getElementById('commit-progress') });
 
 
+d3.select('#scatter-story')
+  .selectAll('.step')
+  .data(commits)
+  .join('div')
+  .attr('class', 'step')
+  .html(
+    (d, i) => `
+		On ${d.datetime.toLocaleString('en', {
+      dateStyle: 'full',
+      timeStyle: 'short',
+    })},
+		I made <a href="${d.url}" target="_blank">${
+      i > 0 ? 'another glorious commit' : 'my first commit, and it was glorious'
+    }</a>.
+		I edited ${d.totalLines} lines across ${
+      d3.rollups(
+        d.lines,
+        (D) => D.length,
+        (d) => d.file,
+      ).length
+    } files.
+		Then I looked over all I had made, and I saw that it was very good.
+	`,
+  );
+
+function onStepEnter(response) {
+  const commit = response.element.__data__;
+  const dt = commit.datetime;
+
+  // Log if you still want to debug
+  console.log(dt);
+
+  // Use the same pipeline as the slider:
+  setCommitMaxTime(dt);
+}
+
+
+const scroller = scrollama();
+scroller
+  .setup({
+    container: '#scrolly-1',
+    step: '#scrolly-1 .step',
+  })
+  .onStepEnter(onStepEnter);

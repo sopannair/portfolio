@@ -464,7 +464,17 @@ circle.selected {
   align-items: baseline;
   margin-bottom: 1rem;
   font-size: 1rem;
+
+  /* NEW: keep slider + time pinned while scrolling */
+  position: sticky;
+  top: 0; /* adjust if you want it lower than the nav/title */
+  z-index: 10;
+
+  /* Optional: give it a solid background so text doesn't show through */
+  background: oklch(from var(--color-accent) 89% 3% h);
+  padding-block: 0.5rem;
 }
+
 
 .time-slider-container label {
   display: flex;
